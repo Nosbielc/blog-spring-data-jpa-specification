@@ -2,15 +2,20 @@ package com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.e
 
 import com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.enums.CommentStatus;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-@Data
+import java.util.StringJoiner;
+
+@Getter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "post_comment")
+@Builder(toBuilder = true, builderClassName = "PostCommentEntityBuilder", setterPrefix = "with")
 public class PostComment implements Serializable {
 
     @Id
@@ -41,8 +46,19 @@ public class PostComment implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status")
     private CommentStatus status;
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", PostComment.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("post=" + post)
+                .add("review='" + review + "'")
+                .add("votes=" + votes)
+                .add("createdAt=" + createdAt)
+                .add("status=" + status)
+                .toString();
+    }
 }

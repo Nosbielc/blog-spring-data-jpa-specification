@@ -1,16 +1,20 @@
 package com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
-@Data
+@Getter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "post")
+@Builder(toBuilder = true, builderClassName = "PostEntityBuilder", setterPrefix = "with")
 public class Post implements Serializable {
 
     @Id
@@ -23,16 +27,23 @@ public class Post implements Serializable {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "author")
-    private String author;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<PostComment> comments = new ArrayList<>();
+    @Builder.Default private List<PostComment> comments = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Post.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("title='" + title + "'")
+                .add("content='" + content + "'")
+                .add("createdAt=" + createdAt)
+                .toString();
+    }
 }

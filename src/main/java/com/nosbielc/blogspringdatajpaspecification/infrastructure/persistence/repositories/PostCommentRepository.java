@@ -8,7 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -43,9 +45,13 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long>,
         static Specification<PostComment> orderByCreatedAt(
                 Specification<PostComment> spec) {
             return (root, query, builder) -> {
-                query.orderBy(builder.asc(root.get("created_at")));
+                query.orderBy(builder.asc(root.get("createdAt")));
                 return spec.toPredicate(root, query, builder);
             };
+        }
+
+        static <T, V> Specification<T> contains(String field, Collection<V> value) {
+            return (root, query, cb) -> CollectionUtils.isEmpty(value) ? null : root.get(field).in(value);
         }
     }
 
