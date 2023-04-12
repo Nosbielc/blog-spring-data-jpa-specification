@@ -1,0 +1,52 @@
+package com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.repositories;
+
+import com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.entities.Post;
+import com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.entities.PostComment;
+import com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.entities.User;
+import com.nosbielc.blogspringdatajpaspecification.infrastructure.persistence.enums.CommentStatus;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface PostCommentRepository extends JpaRepository<PostComment, Long>, JpaSpecificationExecutor<PostComment> {
+
+    interface Specs {
+
+        static Specification<PostComment> byPost(Post post) {
+            return (root, query, builder) ->
+                    builder.equal(root.get("post"), post);
+        }
+
+        static Specification<List<PostComment>> byUser(User user) {
+            return  (root, query, builder) -> builder.equal(root.get("user"), user)
+;        }
+
+        static Specification<PostComment> byStatus(CommentStatus status) {
+            return (root, query, builder) ->
+                    builder.equal(root.get("status"), status);
+        }
+
+        static Specification<PostComment> byReviewLike(String reviewPattern) {
+            return (root, query, builder) ->
+                    builder.like(root.get("review"), reviewPattern);
+        }
+
+        static Specification<PostComment> byVotesGreaterThanEqual(int votes) {
+            return (root, query, builder) ->
+                    builder.greaterThanOrEqualTo(root.get("votes"), votes);
+        }
+
+        static Specification<PostComment> orderByCreatedAt(
+                Specification<PostComment> spec) {
+            return (root, query, builder) -> {
+                query.orderBy(builder.asc(root.get("created_at")));
+                return spec.toPredicate(root, query, builder);
+            };
+        }
+    }
+
+}
